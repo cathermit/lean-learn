@@ -215,5 +215,24 @@ def poplist.get {α : Type} (p : poplist α) (n : Nat) (ok : p.inBounds n) : α 
   |0 => p.head
   |i + 1 => p.tail[i]
 
--- class GetElem (coll : Type) (idx : Type) (item : outParam Type) (inBounds : outParam (coll → idx → Prop)) where
---   getElem : (c : coll) → (i : idx) → inBounds c i → item
+--indexing overload for collections
+-- class GetElem (list : Type) (index : Type) (item : outParam Type) (inBounds : outParam (list → index → Prop)) where
+--   getElem : (c : list) → (i : index) → inBounds c i → item
+
+instance {α : Type} : GetElem (poplist α) Nat α poplist.inBounds where
+  getElem := poplist.get
+
+def test : poplist Nat := {head := 1, tail := [0,2,3]}
+
+#eval test[1]
+
+def set.toNat : set → Nat
+  |set.φ => 0
+  |set.suc a => 1 + a.toNat
+
+#eval set.φ.toNat
+
+instance {α : Type} : GetElem (List α) set α (fun l n => l.length > n.toNat) where
+  getElem (l : List α) (a : set) proof := l[a.toNat]
+
+#eval [1,2,3][set.φ]
