@@ -1,0 +1,10 @@
+name = "proof_a"
+version = "0.1.0"
+defaultTargets = ["proof_a"]
+
+[[lean_lib]]
+name = "ProofA"
+
+[[lean_exe]]
+name = "proof_a"
+root = "Main"
