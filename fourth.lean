@@ -246,12 +246,3 @@ def set.compare (a b : set) : Ordering :=
 
 instance : Ord set where
   compare := set.compare
-
-def set.hashset : set → UInt64
-  |set.φ => 0
-  |set.suc a => mixHash 1 (hashset a)
-
-#eval set.hashset (set.suc (set.φ))
-
-instance {α : Type} [Hashable α] : Hashable (poplist α) where
-  hash p := mixHash (hash p.head) (hash p.tail)
