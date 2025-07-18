@@ -236,3 +236,22 @@ instance {α : Type} : GetElem (List α) set α (fun l n => l.length > n.toNat) 
   getElem (l : List α) (a : set) proof := l[a.toNat]
 
 #eval [1,2,3][set.φ]
+
+def set.compare (a b : set) : Ordering :=
+  match a, b with
+  |set.φ, set.φ => Ordering.eq
+  |set.suc _, set.φ => Ordering.gt
+  |set.φ, set.suc _ => Ordering.lt
+  |set.suc x, set.suc y => set.compare x y
+
+instance : Ord set where
+  compare := set.compare
+
+def set.hashset : set → UInt64
+  |set.φ => 0
+  |set.suc a => mixHash 1 (hashset a)
+
+#eval set.hashset (set.suc (set.φ))
+
+instance {α : Type} [Hashable α] : Hashable (poplist α) where
+  hash p := mixHash (hash p.head) (hash p.tail)
