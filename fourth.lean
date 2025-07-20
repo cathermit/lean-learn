@@ -246,3 +246,18 @@ def set.compare (a b : set) : Ordering :=
 
 instance : Ord set where
   compare := set.compare
+
+def set.hashset : set → UInt64
+  |set.φ => 0
+  |set.suc a => mixHash 1 (hashset a)
+
+#eval set.hashset (set.suc (set.φ))
+
+instance {α : Type} [Hashable α] : Hashable (poplist α) where
+  hash p := mixHash (hash p.head) (hash p.tail)
+
+inductive binarytree (α : Type) where
+  |leaf
+  |branch : (binarytree α) → α → (binarytree α) → (binarytree α)
+
+#eval ((binarytree.branch binarytree.leaf 1 binarytree.leaf) : binarytree Nat)
