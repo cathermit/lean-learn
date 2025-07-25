@@ -261,3 +261,41 @@ inductive binarytree (α : Type) where
   |branch : (binarytree α) → α → (binarytree α) → (binarytree α)
 
 #eval ((binarytree.branch binarytree.leaf 1 binarytree.leaf) : binarytree Nat)
+
+def binarytree.hashbinarytree {α : Type} [Hashable α] : binarytree α → UInt64
+  |binarytree.leaf => 0
+  |binarytree.branch l x r => mixHash 1 (mixHash l.hashbinarytree (mixHash (hash x) (r.hashbinarytree)))
+
+instance {α : Type} [Hashable α] : Hashable (binarytree α) where
+  hash := binarytree.hashbinarytree
+
+def binarytree.equal {α : Type} [BEq α] : (binarytree α) → (binarytree α) → Bool
+  |binarytree.leaf, binarytree.leaf => true
+  |binarytree.branch a x a1, binarytree.branch b y b1 => (binarytree.equal a b) && (binarytree.equal a1 b1) && (x == y)
+  |_, _ => false
+
+instance {α : Type} [BEq α] : BEq (binarytree α) where
+  beq := binarytree.equal
+
+instance : Functor poplist where
+  map f p := {head := f p.head, tail := Functor.map f p.tail}
+  mapConst x _ :=  {head := x, tail := []}
+
+#eval (· + 1) <$> ({head := 1, tail := [2,3]} : poplist Nat)
+
+#eval (· ++ "yo") <$> ({head := "stymie", tail := ["king", "turmoil", "arcanine"]} :poplist String)
+
+#eval Functor.mapConst (1) ({head := 10, tail := [1]} : poplist Nat)
+
+-- class Functor (f : Type → Type) where
+--   map : {α β : Type} → (α → β) → f α → f β --(α → β is the function) (f is the collection) function → collecion α → collection β
+
+--   mapConst {α β : Type} (x : α) (coll : f β) : f α :=
+--     map (fun _ => x) coll
+
+def binarytree.transform {α β: Type} (f : α → β) : (binarytree α) → (binarytree β)
+  |binarytree.leaf => binarytree.leaf
+  |binarytree.branch b1 x b2 => binarytree.branch (binarytree.transform f b1) (f x) (binarytree.transform f b2)
+
+instance : Functor binarytree where
+  map := binarytree.transform
