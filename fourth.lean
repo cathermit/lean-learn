@@ -299,3 +299,15 @@ def binarytree.transform {α β: Type} (f : α → β) : (binarytree α) → (bi
 
 instance : Functor binarytree where
   map := binarytree.transform
+
+instance : Coe set Nat where
+coe x := x.toNat
+
+#eval [1,2,100].drop (set.suc (set.φ))
+#check [1,2,100].drop (set.suc (set.φ))
+
+#eval [1,2,100].drop (3 : set)
+#check [1,2,100].drop (set.suc (set.φ))
+
+instance : Coe Nat positive where
+coe n :=
